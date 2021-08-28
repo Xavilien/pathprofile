@@ -1,3 +1,6 @@
+from math import log10
+
+
 def mgr_distance(mgr1, mgr2):
     """Calculate distance btween 2 mgrs"""
     mgr1 = map(lambda x: float(x)/10, mgr1.split())
@@ -72,26 +75,35 @@ def calculate_effective_object(obj1, obj2, distance):
 
 def main():
     # Step 1: collect all the parameters for the formulas
-    radio = int(checker('408 or 406? ', lambda r: r in ['406', '408']))
-    freq = float(checker('Transmitting frequency? ', lambda f: check_freq(radio, f)))
-    distance = float(checker('Total distance between the nodes(km)? ', check_float))
-    ht = float(checker('Height of transmitting node in metres? ', check_float))
-    hr = float(checker('Height of receiving node in metres? ', check_float))
+    # radio = int(checker('Radio type (406/408): ', lambda r: r in ['406', '408']))
+    # freq = float(checker('Transmitting frequency: ', lambda f: check_freq(radio, f)))
+    # distance = float(checker('Total distance between the nodes (km): ', check_float))
+    # ht = float(checker('Height of transmitting node (m): ', check_float))
+    # hr = float(checker('Height of receiving node (m): ', check_float))
 
-    number_of_objects = int(checker('How many objects between the two nodes? ', check_int))
+    radio = 406
+    freq = 610
+    distance = 10
+    ht = 30
+    hr = 30
+
+    number_of_objects = int(checker('\nNumber of objects between the two nodes: ', check_int))
 
     objects = []
     largest_object = (0.0, 0.0)
 
     for i in range(1, number_of_objects+1):
-        d = float(checker('Distance between object ' + str(i) + ' and the transmitting node in km?', check_float))
-        h = float(checker('Height of object ' + str(i) + ' in metres?', check_float))
+        d = float(checker('\nDistance between object ' + str(i) + ' and transmitting node (km): ',
+                          lambda dist: check_float and float(dist) < distance))
+        h = float(checker('Height of object ' + str(i) + ' (m): ', check_float))
         objects.append((d, h))
 
         if h > largest_object[1]:
             largest_object = objects[-1]
 
     objects.sort()
+
+    print ""
 
     # Step 2: calculate height and distance of final object
     for i in range(len(objects)):
@@ -105,8 +117,11 @@ def main():
     h = largest_object[1]
 
     # Step 3: adjust height of final objects for earth curvature correction
-    height_correction = d1 * d2 / 12.74 / 1.33
+    height_correction = d1 * d2 / 12.75 / 0.7
     h += height_correction
+
+    print "The final calculated object is " + str(d1) + \
+          "km away from the transmitting node, with a height of " + str(h) + "m"
 
     # Step 4: calculate height of LOS over the object
     if hr > ht:
@@ -116,31 +131,51 @@ def main():
     else:
         los = ht
 
+    print "The height of the LOS over the object is " + str(los) + "m"
+
     # Step 5: calculate height of 0.6 first fresnel zone
     radius = 0.6 * 548 * (d1 * d2 / freq / distance) ** 0.5
     ffz_height = los - radius
 
+    print "0.6 of the first fresnel zone radius is " + str(radius) + "m"
+
     # Step 6: find the relevant case and calculate EPL
-    if h < ffz_height:  # case 1/2
-        pass
+    fsl = 20 * log10(41.87 * freq * distance)
+    pel = 115.11 + 40 * log10(distance) - 20 * log10(ht * hr)
+
+    if h < ffz_height:  # case 1/2 no obstruction within 0.6 of the first fresnel zone
+        epl = fsl
+        print "Since the object is not within 0.6 of the first fresnel zone, EPL = FSL"
     elif h > los:  # case 4
-        pass
+        if fsl > pel:
+            sl_fs = 19.22 * log10(h) - 9.5 * log10(d1) + 10 * log10(freq) - 41.84
+            epl = fsl + sl_fs
+        else:
+            sl_pe = 20.3 * log10(h) - 20 * log10(d1) + 10 * log10(freq) - 40
+            epl = pel + sl_pe
+        print "Since the object blocks the LOS, EPL = FSL + SL"
     else:  # case 3
-        pass
+        epl = pel
+        print "Since the object is within 0.6 of the first fresnel zone but does not block the LOS, EPL = PEL"
 
-    print("EPL =",  epl)
+    print "\nEPL =",  epl
 
-    # Step 7: calculate APL
-    apl = 0
-    print("APL =",  apl)
+    # Step 7: calculate APL, we assume receiver sensitivity using 2048MBps
+    if radio == 408:
+        apl = 36. + 2 * 20 - 2 * 2.4 - (-82)
+    else:
+        apl = 40. + 2 * 15 - 2 * 9 - (-82)
+    print "APL =",  apl
 
     # Step 8: calculate FM
     fm = apl - epl
-    print("FM =", fm)
+    print "FM =", fm
 
     # Step 9: conclude if comms is through
     if fm > 20:
-        print("Comms through!!!")
+        print "\nComms through!!!"
+    else:
+        print "\nNo comms :("
 
 
 if __name__ == '__main__':
