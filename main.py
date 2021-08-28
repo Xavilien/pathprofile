@@ -75,17 +75,11 @@ def calculate_effective_object(obj1, obj2, distance):
 
 def main():
     # Step 1: collect all the parameters for the formulas
-    # radio = int(checker('Radio type (406/408): ', lambda r: r in ['406', '408']))
-    # freq = float(checker('Transmitting frequency: ', lambda f: check_freq(radio, f)))
-    # distance = float(checker('Total distance between the nodes (km): ', check_float))
-    # ht = float(checker('Height of transmitting node (m): ', check_float))
-    # hr = float(checker('Height of receiving node (m): ', check_float))
-
-    radio = 406
-    freq = 610
-    distance = 10
-    ht = 30
-    hr = 30
+    radio = int(checker('Radio type (406/408): ', lambda r: r in ['406', '408']))
+    freq = float(checker('Transmitting frequency: ', lambda f: check_freq(radio, f)))
+    distance = float(checker('Total distance between the nodes (km): ', check_float))
+    ht = float(checker('Height of transmitting node (m): ', check_float))
+    hr = float(checker('Height of receiving node (m): ', check_float))
 
     number_of_objects = int(checker('\nNumber of objects between the two nodes: ', check_int))
 
@@ -103,8 +97,6 @@ def main():
 
     objects.sort()
 
-    print ""
-
     # Step 2: calculate height and distance of final object
     for i in range(len(objects)):
         for x in range(i+1, len(objects)):
@@ -120,7 +112,7 @@ def main():
     height_correction = d1 * d2 / 12.75 / 0.7
     h += height_correction
 
-    print "The final calculated object is " + str(d1) + \
+    print "\nThe final calculated object is " + str(d1) + \
           "km away from the transmitting node, with a height of " + str(h) + "m"
 
     # Step 4: calculate height of LOS over the object
@@ -150,10 +142,11 @@ def main():
         if fsl > pel:
             sl_fs = 19.22 * log10(h) - 9.5 * log10(d1) + 10 * log10(freq) - 41.84
             epl = fsl + sl_fs
+            print "Since the object blocks the LOS, EPL = FSL + SL"
         else:
             sl_pe = 20.3 * log10(h) - 20 * log10(d1) + 10 * log10(freq) - 40
             epl = pel + sl_pe
-        print "Since the object blocks the LOS, EPL = FSL + SL"
+            print "Since the object blocks the LOS, EPL = PEL + SL"
     else:  # case 3
         epl = pel
         print "Since the object is within 0.6 of the first fresnel zone but does not block the LOS, EPL = PEL"
