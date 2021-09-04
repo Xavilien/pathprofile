@@ -1,15 +1,4 @@
-from math import log10
-
-
-def mgr_distance(mgr1, mgr2):
-    """Calculate distance btween 2 mgrs"""
-    mgr1 = map(lambda x: float(x)/10, mgr1.split())
-    mgr2 = map(lambda x: float(x)/10, mgr2.split())
-    distance = ((mgr1[0] - mgr2[0]) ** 2 + (mgr1[1] - mgr2[1]) ** 2) ** 0.5
-
-    print(distance)
-
-    return distance
+from math import log10, atan, pi
 
 
 def checker(question, check):
@@ -19,7 +8,7 @@ def checker(question, check):
         if check(output):
             return output
         else:
-            print("Not valid input")
+            print("Not valid input\n")
 
 
 def check_float(x):
@@ -59,6 +48,54 @@ def check_freq(radio, freq):
     return True
 
 
+def check_mgr(mgr):
+    """Checks that MGR inputted is valid"""
+    mgr = mgr.split()
+    if len(mgr) == 2:
+        return check_int(mgr[0]) and check_int(mgr[1])
+    return False
+
+
+def get_mgr():
+    """Ask user input for mgr"""
+    mgr1 = checker("First MGR: ", check_mgr)
+    mgr2 = checker("Second MGR: ", check_mgr)
+
+    mgr1 = map(lambda x: float(x)/10, mgr1.split())
+    mgr2 = map(lambda x: float(x)/10, mgr2.split())
+
+    return mgr1, mgr2
+
+
+def mgr_distance(mgr1, mgr2):
+    """Calculate distance btween 2 mgrs"""
+    distance = ((mgr1[0] - mgr2[0]) ** 2 + (mgr1[1] - mgr2[1]) ** 2) ** 0.5
+
+    return distance
+
+
+def azimuth(mgr1, mgr2):
+    """Calculate MGR from mgr1 to mgr2"""
+    h = mgr2[0] - mgr1[0]
+    v = mgr2[1] - mgr1[1]
+
+    if h == 0 and v >= 0:  # North
+        return 0
+    elif h == 0 and v < 0:  # South
+        return 3200
+
+    angle = abs(atan(v/h)) / pi * 3200  # Must convert from radians to mils
+
+    if h > 0 and v >= 0:  # First quadrant
+        return 1600 - angle
+    elif h > 0 and v < 0:  # Second quadrant
+        return 1600 + angle
+    elif h < 0 and v < 0:  # Third quadrant
+        return 4800 - angle
+    else:  # Fourth quadrant
+        return 4800 + angle
+
+
 def calculate_effective_object(obj1, obj2, distance):
     """Calculate the effective height and distance of the imaginary object created by 2 different objects in path"""
     grad1 = obj1[1]/obj1[0]
@@ -73,7 +110,7 @@ def calculate_effective_object(obj1, obj2, distance):
     return d, h
 
 
-def main():
+def pathprofile():
     # Step 1: collect all the parameters for the formulas
     radio = int(checker('Radio type (406/408): ', lambda r: r in ['406', '408']))
     freq = float(checker('Transmitting frequency: ', lambda f: check_freq(radio, f)))
@@ -88,7 +125,7 @@ def main():
 
     for i in range(1, number_of_objects+1):
         d = float(checker('\nDistance between object ' + str(i) + ' and transmitting node (km): ',
-                          lambda dist: check_float and float(dist) < distance))
+                          lambda dist: check_float and 0 < float(dist) < distance))
         h = float(checker('Height of object ' + str(i) + ' (m): ', check_float))
         objects.append((d, h))
 
@@ -169,6 +206,24 @@ def main():
         print "\nComms through!!!"
     else:
         print "\nNo comms :("
+
+
+def main():
+    while True:
+        choice = int(checker("1) Path Profile, 2) Distance, 3) Azimuth, 4) Quit: ",
+                             lambda x: check_int(x) and 1 <= int(x) <= 4))
+        if choice == 4:
+            break
+        elif choice == 1:
+            pathprofile()
+        else:
+            mgr1, mgr2 = get_mgr()
+            if choice == 2:
+                print "\n", mgr_distance(mgr1, mgr2)
+            else:
+                print "\n", azimuth(mgr1, mgr2)
+
+        print
 
 
 if __name__ == '__main__':
