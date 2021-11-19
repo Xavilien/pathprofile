@@ -4,7 +4,7 @@ from math import log10, atan, pi
 def checker(question, check):
     """Asks user a question and checks that the input is valid, if not ask again"""
     while True:
-        output = raw_input(question)
+        output = input(question)
         if check(output):
             return output
         else:
