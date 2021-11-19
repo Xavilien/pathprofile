@@ -61,8 +61,8 @@ def get_mgr():
     mgr1 = checker("First MGR: ", check_mgr)
     mgr2 = checker("Second MGR: ", check_mgr)
 
-    mgr1 = map(lambda x: float(x)/10, mgr1.split())
-    mgr2 = map(lambda x: float(x)/10, mgr2.split())
+    mgr1 = list(map(lambda x: float(x)/10, mgr1.split()))
+    mgr2 = list(map(lambda x: float(x)/10, mgr2.split()))
 
     return mgr1, mgr2
 
@@ -132,8 +132,6 @@ def pathprofile():
         if h > largest_object[1]:
             largest_object = objects[-1]
 
-    objects.sort()
-
     # Step 2: calculate height and distance of final object
     for i in range(len(objects)):
         for x in range(i+1, len(objects)):
@@ -149,8 +147,8 @@ def pathprofile():
     height_correction = d1 * d2 / 12.75 / 0.7
     h += height_correction
 
-    print "\nThe final calculated object is " + str(d1) + \
-          "km away from the transmitting node, with a height of " + str(h) + "m"
+    print("\nThe final calculated object is " + str(d1) +
+          "km away from the transmitting node, with a height of " + str(h) + "m")
 
     # Step 4: calculate height of LOS over the object
     if hr > ht:
@@ -160,13 +158,13 @@ def pathprofile():
     else:
         los = ht
 
-    print "The height of the LOS over the object is " + str(los) + "m"
+    print("The height of the LOS over the object is " + str(los) + "m")
 
     # Step 5: calculate height of 0.6 first fresnel zone
     radius = 0.6 * 548 * (d1 * d2 / freq / distance) ** 0.5
     ffz_height = los - radius
 
-    print "0.6 of the first fresnel zone radius is " + str(radius) + "m"
+    print("0.6 of the first fresnel zone radius is " + str(radius) + "m")
 
     # Step 6: find the relevant case and calculate EPL
     fsl = 20 * log10(41.87 * freq * distance)
@@ -174,38 +172,38 @@ def pathprofile():
 
     if h < ffz_height:  # case 1/2 no obstruction within 0.6 of the first fresnel zone
         epl = fsl
-        print "Since the object is not within 0.6 of the first fresnel zone, EPL = FSL"
+        print("Since the object is not within 0.6 of the first fresnel zone, EPL = FSL")
     elif h > los:  # case 4
         if fsl > pel:
             sl_fs = 19.22 * log10(h) - 9.5 * log10(d1) + 10 * log10(freq) - 41.84
             epl = fsl + sl_fs
-            print "Since the object blocks the LOS, EPL = FSL + SL"
+            print("Since the object blocks the LOS, EPL = FSL + SL")
         else:
             sl_pe = 20.3 * log10(h) - 20 * log10(d1) + 10 * log10(freq) - 40
             epl = pel + sl_pe
-            print "Since the object blocks the LOS, EPL = PEL + SL"
+            print("Since the object blocks the LOS, EPL = PEL + SL")
     else:  # case 3
         epl = pel
-        print "Since the object is within 0.6 of the first fresnel zone but does not block the LOS, EPL = PEL"
+        print("Since the object is within 0.6 of the first fresnel zone but does not block the LOS, EPL = PEL")
 
-    print "\nEPL =",  epl
+    print("\nEPL =",  epl)
 
     # Step 7: calculate APL, we assume receiver sensitivity using 2048MBps
     if radio == 408:
         apl = 36. + 2 * 20 - 2 * 2.4 - (-82)
     else:
         apl = 40. + 2 * 15 - 2 * 9 - (-82)
-    print "APL =",  apl
+    print("APL =",  apl)
 
     # Step 8: calculate FM
     fm = apl - epl
-    print "FM =", fm
+    print("FM =", fm)
 
     # Step 9: conclude if comms is through
     if fm > 20:
-        print "\nComms through!!!"
+        print("\nComms through!!!")
     else:
-        print "\nNo comms :("
+        print("\nNo comms :(")
 
 
 def main():
@@ -219,11 +217,11 @@ def main():
         else:
             mgr1, mgr2 = get_mgr()
             if choice == 2:
-                print "\n", mgr_distance(mgr1, mgr2)
+                print("\n", mgr_distance(mgr1, mgr2))
             else:
-                print "\n", azimuth(mgr1, mgr2)
+                print("\n", azimuth(mgr1, mgr2))
 
-        print
+        print()
 
 
 if __name__ == '__main__':
