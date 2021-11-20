@@ -386,10 +386,10 @@ def main():
     dp.add_handler(CommandHandler("help", start))
 
     print("Starting bot...")
-    updater.start_polling()  # Start the bot
+    # updater.start_polling()  # Start the bot
 
-    # url = "https://quack-farm.herokuapp.com/" + TOKEN
-    # updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=url)
+    url = "https://pathprofile.herokuapp.com/" + TOKEN
+    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=url)
 
     updater.idle()  # Not exactly sure why this has to be here to be honest
 
