@@ -7,11 +7,13 @@ from main import get_distance, get_azimuth, check_freq, calculate_effective_obst
 import logging
 import logging.config
 
-TOKEN = "2112364814:AAGtfjTvU40RROHTt7oJsE69w-cW2qVERCs"
-
+TOKEN = os.environ.get('PATHPROFILE_TOKEN')
 PORT = int(os.environ.get('PORT', 5000))
 
 VERSION = 1.1
+VERSION_INTRO = "I hope this is working"
+
+logging.config.fileConfig('logconfig.ini')  # references logging config
 
 chats = {}
 
@@ -30,13 +32,20 @@ def typing(func):
 # /version
 @typing
 def version(update, _):
-    update.message.reply_text(f"Version {VERSION}")
+    update.message.reply_text(f"Version {VERSION}\n"
+                              f"{VERSION_INTRO}")
     return -1
+
+
+def log(update, command):
+    username = update.message.chat.username
+    logging.info(f"{username} ran {command}")
 
 
 # Bot replies "Hello World!" when the /start command is activated for the Bot
 @typing
 def start(update, _):
+    log(update, "/start")
     welcome_message = "I can help you calculate path profile, azimuth, and distance between two MGRs.\n\n" \
                       "You can control me by sending these commands:\n\n" \
                       "/pathprofile - calculate path profile\n" \
@@ -75,6 +84,7 @@ def azimuth(update, context):
     """
     text = update.message.text
     if text == '/azimuth':
+        log(update, "/azimuth")
         update.message.reply_text("Please enter the two MGRs as such:\n100 100\n200 200")
         return "azimuth"
     else:
@@ -93,6 +103,7 @@ def distance(update, context):
     """
     text = update.message.text
     if text == '/distance':
+        log(update, "/distance")
         update.message.reply_text("Please enter the two MGRs as such:\n100 100\n200 200")
         return "distance"
     else:
@@ -115,6 +126,7 @@ def pathprofile(update, context):
     chat = chats.get(update.message.chat_id)  # Keep track of variables the user has inputted
 
     if text == "/pathprofile":
+        log(update, "/pathprofile")
         chats[update.message.chat_id] = {}
         update.message.reply_text("Please enter the two MGRs as such:\n100 100\n200 200")
         return "pathprofile"
@@ -381,8 +393,6 @@ def get_conversation_handler():
 
 
 def main():
-    logging.config.fileConfig('logconfig.ini') # references logging config
-
     updater = Updater(TOKEN)
     dp = updater.dispatcher  # Registers handlers
 
