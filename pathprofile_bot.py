@@ -9,7 +9,7 @@ TOKEN = "2112364814:AAGtfjTvU40RROHTt7oJsE69w-cW2qVERCs"
 
 PORT = int(os.environ.get('PORT', 5000))
 
-VERSION = 1.0
+VERSION = 1.1
 
 chats = {}
 
