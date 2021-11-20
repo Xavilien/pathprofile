@@ -35,7 +35,7 @@ def version(update, _):
 # Bot replies "Hello World!" when the /start command is activated for the Bot
 @typing
 def start(update, _):
-    welcome_message = "I can help you calculate path profile, azimuth, and distance between 2 MGRs.\n\n" \
+    welcome_message = "I can help you calculate path profile, azimuth, and distance between two MGRs.\n\n" \
                       "You can control me by sending these commands:\n\n" \
                       "/pathprofile - calculate path profile\n" \
                       "/distance - calculate distance (in km) between 2 MGRs\n" \
