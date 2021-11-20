@@ -4,6 +4,8 @@ import os
 from math import log10
 from functools import wraps
 from main import get_distance, get_azimuth, check_freq, calculate_effective_obstacle
+import logging
+import logging.config
 
 TOKEN = "2112364814:AAGtfjTvU40RROHTt7oJsE69w-cW2qVERCs"
 
@@ -379,6 +381,8 @@ def get_conversation_handler():
 
 
 def main():
+    logging.config.fileConfig('logconfig.ini') # references logging config
+
     updater = Updater(TOKEN)
     dp = updater.dispatcher  # Registers handlers
 
