@@ -67,14 +67,14 @@ def get_mgr():
     return mgr1, mgr2
 
 
-def mgr_distance(mgr1, mgr2):
+def get_distance(mgr1, mgr2):
     """Calculate distance btween 2 mgrs"""
     distance = ((mgr1[0] - mgr2[0]) ** 2 + (mgr1[1] - mgr2[1]) ** 2) ** 0.5
 
     return distance
 
 
-def azimuth(mgr1, mgr2):
+def get_azimuth(mgr1, mgr2):
     """Calculate MGR from mgr1 to mgr2"""
     h = mgr2[0] - mgr1[0]
     v = mgr2[1] - mgr1[1]
@@ -217,9 +217,9 @@ def main():
         else:
             mgr1, mgr2 = get_mgr()
             if choice == 2:
-                print("\n", mgr_distance(mgr1, mgr2))
+                print("\n", get_distance(mgr1, mgr2))
             else:
-                print("\n", azimuth(mgr1, mgr2))
+                print("\n", get_azimuth(mgr1, mgr2))
 
         print()
 
