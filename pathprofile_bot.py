@@ -10,8 +10,8 @@ import logging.config
 TOKEN = os.environ.get('PATHPROFILE_TOKEN')
 PORT = int(os.environ.get('PORT', 5000))
 
-VERSION = 1.1
-VERSION_INTRO = "I hope this is working"
+VERSION = 1.3
+VERSION_INTRO = "Testing logging"
 
 logging.config.fileConfig('logconfig.ini')  # references logging config
 
