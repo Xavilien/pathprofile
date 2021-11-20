@@ -9,7 +9,7 @@ TOKEN = "2112364814:AAGtfjTvU40RROHTt7oJsE69w-cW2qVERCs"
 
 PORT = int(os.environ.get('PORT', 5000))
 
-VERSION = 0.0
+VERSION = 1.0
 
 chats = {}
 
@@ -37,10 +37,12 @@ def version(update, _):
 def start(update, _):
     welcome_message = "I can help you calculate path profile, azimuth, and distance between 2 MGRs.\n\n" \
                       "You can control me by sending these commands:\n\n" \
-                      "/pathprofile - Calculate path profile\n" \
-                      "/distance - Calculate distance (in km) between 2 MGRs\n" \
-                      "/azimuth - Calculate azimuth (in mils) from MGR 1 to MGR 2" \
-                      "/cancel - Cancel current operation (e.g. in case of incorrect entry)."
+                      "/pathprofile - calculate path profile\n" \
+                      "/distance - calculate distance (in km) between 2 MGRs\n" \
+                      "/azimuth - calculate azimuth (in mils) from MGR 1 to MGR 2\n" \
+                      "/cancel - cancel current operation (e.g. in case of incorrect entry)\n" \
+                      "/help - show this message\n\n" \
+                      "Any feedback can be directed to @xavilien"
     update.message.reply_text(welcome_message)
     return -1
 
