@@ -96,8 +96,8 @@ def get_azimuth(mgr1, mgr2):
         return 4800 + angle
 
 
-def calculate_effective_object(obj1, obj2, distance):
-    """Calculate the effective height and distance of the imaginary object created by 2 different objects in path"""
+def calculate_effective_obstacle(obj1, obj2, distance):
+    """Calculate the effective height and distance of the imaginary obstacle created by 2 different obstacles in path"""
     grad1 = obj1[1]/obj1[0]
     grad2 = -obj2[1] / (distance-obj2[0])
 
@@ -118,39 +118,39 @@ def pathprofile():
     ht = float(checker('Height of transmitting node (m): ', check_float))
     hr = float(checker('Height of receiving node (m): ', check_float))
 
-    number_of_objects = int(checker('\nNumber of objects between the two nodes: ', check_int))
+    number_of_obstacles = int(checker('\nNumber of obstacles between the two nodes: ', check_int))
 
-    objects = []
-    largest_object = (0.0, 0.0)
+    obstacles = []
+    largest_obstacle = (0.0, 0.0)
 
-    for i in range(1, number_of_objects+1):
-        d = float(checker('\nDistance between object ' + str(i) + ' and transmitting node (km): ',
+    for i in range(1, number_of_obstacles+1):
+        d = float(checker('\nDistance between obstacle ' + str(i) + ' and transmitting node (km): ',
                           lambda dist: check_float and 0 < float(dist) < distance))
-        h = float(checker('Height of object ' + str(i) + ' (m): ', check_float))
-        objects.append((d, h))
+        h = float(checker('Height of obstacle ' + str(i) + ' (m): ', check_float))
+        obstacles.append((d, h))
 
-        if h > largest_object[1]:
-            largest_object = objects[-1]
+        if h > largest_obstacle[1]:
+            largest_obstacle = obstacles[-1]
 
-    # Step 2: calculate height and distance of final object
-    for i in range(len(objects)):
-        for x in range(i+1, len(objects)):
-            obj = calculate_effective_object(objects[i], objects[x], distance)
-            if obj[1] > largest_object[1]:
-                largest_object = obj
+    # Step 2: calculate height and distance of final obstacle
+    for i in range(len(obstacles)):
+        for x in range(i+1, len(obstacles)):
+            obj = calculate_effective_obstacle(obstacles[i], obstacles[x], distance)
+            if obj[1] > largest_obstacle[1]:
+                largest_obstacle = obj
 
-    d1 = largest_object[0]
+    d1 = largest_obstacle[0]
     d2 = distance - d1
-    h = largest_object[1]
+    h = largest_obstacle[1]
 
-    # Step 3: adjust height of final objects for earth curvature correction
+    # Step 3: adjust height of final obstacles for earth curvature correction
     height_correction = d1 * d2 / 12.75 / 0.7
     h += height_correction
 
-    print("\nThe final calculated object is " + str(d1) +
+    print("\nThe final calculated obstacle is " + str(d1) +
           "km away from the transmitting node, with a height of " + str(h) + "m")
 
-    # Step 4: calculate height of LOS over the object
+    # Step 4: calculate height of LOS over the obstacle
     if hr > ht:
         los = (hr - ht) * d1 / distance + ht
     elif ht > hr:
@@ -158,7 +158,7 @@ def pathprofile():
     else:
         los = ht
 
-    print("The height of the LOS over the object is " + str(los) + "m")
+    print("The height of the LOS over the obstacle is " + str(los) + "m")
 
     # Step 5: calculate height of 0.6 first fresnel zone
     radius = 0.6 * 548 * (d1 * d2 / freq / distance) ** 0.5
@@ -172,19 +172,19 @@ def pathprofile():
 
     if h < ffz_height:  # case 1/2 no obstruction within 0.6 of the first fresnel zone
         epl = fsl
-        print("Since the object is not within 0.6 of the first fresnel zone, EPL = FSL")
+        print("Since the obstacle is not within 0.6 of the first fresnel zone, EPL = FSL")
     elif h > los:  # case 4
         if fsl > pel:
             sl_fs = 19.22 * log10(h) - 9.5 * log10(d1) + 10 * log10(freq) - 41.84
             epl = fsl + sl_fs
-            print("Since the object blocks the LOS, EPL = FSL + SL")
+            print("Since the obstacle blocks the LOS, EPL = FSL + SL")
         else:
             sl_pe = 20.3 * log10(h) - 20 * log10(d1) + 10 * log10(freq) - 40
             epl = pel + sl_pe
-            print("Since the object blocks the LOS, EPL = PEL + SL")
+            print("Since the obstacle blocks the LOS, EPL = PEL + SL")
     else:  # case 3
         epl = pel
-        print("Since the object is within 0.6 of the first fresnel zone but does not block the LOS, EPL = PEL")
+        print("Since the obstacle is within 0.6 of the first fresnel zone but does not block the LOS, EPL = PEL")
 
     print("\nEPL =",  epl)
 
