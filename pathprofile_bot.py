@@ -4,8 +4,6 @@ import os
 from math import log10
 from functools import wraps
 from main import get_distance, get_azimuth, check_freq, calculate_effective_obstacle
-import logging
-import logging.config
 
 TOKEN = os.environ.get('PATHPROFILE_TOKEN')
 PORT = int(os.environ.get('PORT', 5000))
@@ -13,9 +11,8 @@ PORT = int(os.environ.get('PORT', 5000))
 VERSION = 1.3
 VERSION_INTRO = "Testing logging"
 
-logging.config.fileConfig('logconfig.ini')  # references logging config
-
 chats = {}
+logs = []
 
 
 def typing(func):
@@ -39,7 +36,17 @@ def version(update, _):
 
 def log(update, command):
     username = update.message.chat.username
-    logging.info(f"{username} ran {command}")
+    message = f"{username} ran {command}"
+    print(message)
+    logs.append(message + "\n")
+
+
+@typing
+def send_logs(update, _):
+    if len(logs) > 0:
+        update.message.reply_text("".join(logs))
+    else:
+        update.message.reply_text("No logs.")
 
 
 # Bot replies "Hello World!" when the /start command is activated for the Bot
@@ -400,9 +407,10 @@ def main():
     dp.add_handler(CommandHandler("version", version))  # To keep track of bot updates
     dp.add_handler(CommandHandler("start", start))  # Run start function when /start command is used
     dp.add_handler(CommandHandler("help", start))
+    dp.add_handler(CommandHandler("logs", send_logs))
 
     print("Starting bot...")
-    # updater.start_polling()  # Start the bot
+    updater.start_polling()  # Start the bot
 
     url = "https://pathprofile.herokuapp.com/" + TOKEN
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=url)
