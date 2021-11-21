@@ -1,5 +1,5 @@
 from telegram.ext import Updater, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler, Filters
-from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton, Bot
 import os
 from math import log10
 from functools import wraps
@@ -7,9 +7,10 @@ from main import get_distance, get_azimuth, check_freq, calculate_effective_obst
 
 TOKEN = os.environ.get('PATHPROFILE_TOKEN')
 PORT = int(os.environ.get('PORT', 5000))
+ME = os.environ.get('TELEGRAM_ID')
 
-VERSION = 1.4
-VERSION_INTRO = "Logs work!"
+VERSION = 1.5
+VERSION_INTRO = "Updates owner's chat when someone runs a command"
 
 chats = {}
 logs = []
@@ -39,6 +40,9 @@ def log(update, command):
     message = f"{username} ran {command}"
     print(message)
     logs.append(message + "\n")
+
+    bot = Bot(TOKEN)
+    bot.send_message(ME, message)
 
 
 @typing
@@ -410,7 +414,7 @@ def main():
     dp.add_handler(CommandHandler("logs", send_logs))
 
     print("Starting bot...")
-    # updater.start_polling()  # Start the bot
+    updater.start_polling()  # Start the bot
 
     url = "https://pathprofile.herokuapp.com/" + TOKEN
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=url)
