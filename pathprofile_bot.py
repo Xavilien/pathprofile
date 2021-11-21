@@ -9,7 +9,7 @@ TOKEN = os.environ.get('PATHPROFILE_TOKEN')
 PORT = int(os.environ.get('PORT', 5000))
 ME = os.environ.get('TELEGRAM_ID')
 
-VERSION = 1.5
+VERSION = 1.6
 VERSION_INTRO = "Updates owner's chat when someone runs a command"
 
 chats = {}
@@ -415,7 +415,7 @@ def main():
     dp.add_handler(CommandHandler("logs", send_logs))
 
     print("Starting bot...")
-    updater.start_polling()  # Start the bot
+    # updater.start_polling()  # Start the bot
 
     url = "https://pathprofile.herokuapp.com/" + TOKEN
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=url)
