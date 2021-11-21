@@ -41,8 +41,9 @@ def log(update, command):
     print(message)
     logs.append(message + "\n")
 
-    bot = Bot(TOKEN)
-    bot.send_message(ME, message)
+    if ME:
+        bot = Bot(TOKEN)
+        bot.send_message(ME, message)
 
 
 @typing
