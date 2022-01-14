@@ -1,5 +1,6 @@
 from telegram.ext import Updater, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler, Filters
 from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton, Bot
+from telegram import ParseMode
 import os
 from math import log10
 from functools import wraps
@@ -7,9 +8,9 @@ from main import get_distance, get_azimuth, check_freq, calculate_effective_obst
 
 TOKEN = os.environ.get('PATHPROFILE_TOKEN')
 PORT = int(os.environ.get('PORT', 5000))
-OWNER = os.environ.get('TELEGRAM_ID')
+OWNER = os.environ.get('TELEGRAM_ID', None)
 
-VERSION = 1.7
+VERSION = 1.8
 VERSION_INTRO = "Updates owner's chat when someone runs a command with quick link to username of user"
 
 chats = {}
@@ -30,15 +31,17 @@ def typing(func):
 # /version
 @typing
 def version(update, _):
-    update.message.reply_text(f"Version {VERSION}\n"
-                              f"{VERSION_INTRO}")
+    update.message.reply_text(f"<b>Version {VERSION}</b>\n"
+                              f"{VERSION_INTRO}", parse_mode=ParseMode.HTML)
     return -1
 
 
 # Updates owner when someone runs a command. Stores the logs temporarily which can be accessed by /logs
 def log(update, command):
     username = update.message.chat.username
-    message = f"@{username} ran {command}"
+    userid = update.message.chat.id
+
+    message = f"@{username} ({userid}) ran {command}"
     logs.append(message + "\n")
 
     if OWNER:
@@ -48,12 +51,14 @@ def log(update, command):
 
 @typing
 # /logs
-# Sends who ran what command recently. Logs will be cleared when bot goes to sleep.
+# Sends who ran what command recently. Logs will be cleared when bot goes to sleep. Can only be called by owner
 def send_logs(update, _):
-    if len(logs) > 0:
-        update.message.reply_text("".join(logs))
-    else:
-        update.message.reply_text("No logs.")
+    if str(update.message.chat.id) == OWNER:
+        if len(logs) > 0:
+            update.message.reply_text("".join(logs))
+        else:
+            update.message.reply_text("No logs.")
+    return -1
 
 
 # Bot replies "Hello World!" when the /start command is activated for the Bot
@@ -73,7 +78,9 @@ def start(update, _):
 
 
 @typing
+# /cancel
 def cancel(update, _):
+    log(update, "/cancel")
     update.message.reply_text("Operation cancelled.")
     return -1
 
@@ -408,7 +415,7 @@ def get_conversation_handler():
 
 def main():
     updater = Updater(TOKEN)
-    dp = updater.dispatcher  # Registers handlers
+    dp = updater.dispatcher  # Registers handlers (commands etc)
 
     dp.add_handler(get_conversation_handler())
     dp.add_handler(CommandHandler("version", version))  # To keep track of bot updates
@@ -417,7 +424,7 @@ def main():
     dp.add_handler(CommandHandler("logs", send_logs))
 
     print("Starting bot...")
-    # updater.start_polling()  # Start the bot
+    updater.start_polling()  # Start the bot
 
     url = "https://pathprofile.herokuapp.com/" + TOKEN
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=url)
