@@ -7,10 +7,10 @@ from main import get_distance, get_azimuth, check_freq, calculate_effective_obst
 
 TOKEN = os.environ.get('PATHPROFILE_TOKEN')
 PORT = int(os.environ.get('PORT', 5000))
-ME = os.environ.get('TELEGRAM_ID')
+OWNER = os.environ.get('TELEGRAM_ID')
 
-VERSION = 1.6
-VERSION_INTRO = "Updates owner's chat when someone runs a command"
+VERSION = 1.7
+VERSION_INTRO = "Updates owner's chat when someone runs a command with quick link to username of user"
 
 chats = {}
 logs = []
@@ -35,18 +35,20 @@ def version(update, _):
     return -1
 
 
+# Updates owner when someone runs a command. Stores the logs temporarily which can be accessed by /logs
 def log(update, command):
     username = update.message.chat.username
-    message = f"{username} ran {command}"
-    print(message)
+    message = f"@{username} ran {command}"
     logs.append(message + "\n")
 
-    if ME:
+    if OWNER:
         bot = Bot(TOKEN)
-        bot.send_message(ME, message)
+        bot.send_message(OWNER, message)
 
 
 @typing
+# /logs
+# Sends who ran what command recently. Logs will be cleared when bot goes to sleep.
 def send_logs(update, _):
     if len(logs) > 0:
         update.message.reply_text("".join(logs))
