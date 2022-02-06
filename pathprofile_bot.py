@@ -424,7 +424,7 @@ def main():
     dp.add_handler(CommandHandler("logs", send_logs))
 
     print("Starting bot...")
-    updater.start_polling()  # Start the bot
+    # updater.start_polling()  # Start the bot
 
     url = "https://pathprofile.herokuapp.com/" + TOKEN
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=url)
