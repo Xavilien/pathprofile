@@ -217,9 +217,9 @@ def main():
         else:
             mgr1, mgr2 = get_mgr()
             if choice == 2:
-                print("\n", get_distance(mgr1, mgr2))
+                print(f"{get_distance(mgr1, mgr2):.1f}km")
             else:
-                print("\n", get_azimuth(mgr1, mgr2))
+                print(f"{get_azimuth(mgr1, mgr2):.1f}mils")
 
         print()
 
