@@ -1,7 +1,7 @@
 # Path Profile Bot
 
 ## Overview
-Telegram Bot to calculate Ultra-High Frequency (UHF) path profile, distance and azimuth between 2 points on a map. You can either run it in the CLI or using the following [telegram bot](https://telegram.me/pathprofile_bot).
+Telegram Bot to calculate Ultra-High Frequency (UHF) path profile, distance and azimuth between 2 points on a map. You can either run it in the CLI or using the following [telegram bot](https://telegram.me/pathprofile_bot) (Unfortunately, if I do not manage to find an alternative to heroku, this will not work after 28 Nov 2022 as heroku is removing its free services).
 
 ## Usage
 ### A note on Map Grid References (MGRs)
