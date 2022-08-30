@@ -208,18 +208,18 @@ def pathprofile():
 
 def main():
     while True:
-        choice = int(checker("1) Path Profile, 2) Distance, 3) Azimuth, 4) Quit: ",
+        choice = int(checker("1) Distance, 2) Azimuth, 3) Path Profile, 4) Quit: ",
                              lambda x: check_int(x) and 1 <= int(x) <= 4))
         if choice == 4:
             break
-        elif choice == 1:
+        elif choice == 3:
             pathprofile()
         else:
             mgr1, mgr2 = get_mgr()
-            if choice == 2:
-                print(f"{get_distance(mgr1, mgr2):.1f}km")
+            if choice == 1:
+                print(f"{get_distance(mgr1, mgr2):.2f}km")
             else:
-                print(f"{get_azimuth(mgr1, mgr2):.1f}mils")
+                print(f"{get_azimuth(mgr1, mgr2):.2f}mils")
 
         print()
 
